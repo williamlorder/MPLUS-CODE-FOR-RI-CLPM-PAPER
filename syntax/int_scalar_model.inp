@@ -1,0 +1,67 @@
+TITLE:
+Internalizing Problems Scalar Invariance Model
+DATA:
+FILE = "/Users/zekai/WorkPlace/RI_CLPM/MPLUS/int_scalar_model.dat";
+ 
+VARIABLE:
+NAMES = anx_dep1 anx_dep2 anx_dep3 anx_dep4 wth_dep1 wth_dep2 wth_dep3 wth_dep4
+     som_com1 som_com2 som_com3 som_com4; 
+ MISSING=.;
+ 
+ANALYSIS:
+ESTIMATOR = MLR;
+MODEL:
+
+! 定义时间点1的内化问题因子 - 使用相同载荷标签
+           Int1 BY anx_dep1* (L1)
+                  wth_dep1 (L2)
+                  som_com1 (L3);
+           
+           ! 定义时间点2-4的内化问题因子 - 约束载荷相等
+           Int2 BY anx_dep2* (L1)
+                  wth_dep2 (L2)
+                  som_com2 (L3);
+           
+           Int3 BY anx_dep3* (L1)
+                  wth_dep3 (L2)
+                  som_com3 (L3);
+           
+           Int4 BY anx_dep4* (L1)
+                  wth_dep4 (L2)
+                  som_com4 (L3);
+           
+           ! 设置因子方差
+           Int1@1; Int2@1; Int3@1; Int4@1;
+           
+           ! 设置时间点1因子均值固定为0，其他自由估计
+           [Int1@0]; [Int2*]; [Int3*]; [Int4*];
+           
+           ! 设置项目截距相等（标量不变性核心约束）
+           [anx_dep1] (I1); [anx_dep2] (I1); [anx_dep3] (I1); [anx_dep4] (I1);
+           [wth_dep1] (I2); [wth_dep2] (I2); [wth_dep3] (I2); [wth_dep4] (I2);
+           [som_com1] (I3); [som_com2] (I3); [som_com3] (I3); [som_com4] (I3);
+           
+           ! 自由估计项目残差方差
+           anx_dep1*; anx_dep2*; anx_dep3*; anx_dep4*;
+           wth_dep1*; wth_dep2*; wth_dep3*; wth_dep4*;
+           som_com1*; som_com2*; som_com3*; som_com4*;
+           
+           ! 估计时间因子之间的相关
+           Int1 WITH Int2*; Int1 WITH Int3*; Int1 WITH Int4*;
+           Int2 WITH Int3*; Int2 WITH Int4*;
+           Int3 WITH Int4*;
+           
+           ! 估计相同项目在不同时间点的残差协方差
+           anx_dep1 WITH anx_dep2*; anx_dep1 WITH anx_dep3*; anx_dep1 WITH anx_dep4*;
+           anx_dep2 WITH anx_dep3*; anx_dep2 WITH anx_dep4*;
+           anx_dep3 WITH anx_dep4*;
+           
+           wth_dep1 WITH wth_dep2*; wth_dep1 WITH wth_dep3*; wth_dep1 WITH wth_dep4*;
+           wth_dep2 WITH wth_dep3*; wth_dep2 WITH wth_dep4*;
+           wth_dep3 WITH wth_dep4*;
+           
+           som_com1 WITH som_com2*; som_com1 WITH som_com3*; som_com1 WITH som_com4*;
+           som_com2 WITH som_com3*; som_com2 WITH som_com4*;
+           som_com3 WITH som_com4*;
+OUTPUT:
+STDYX patterns

@@ -1,0 +1,69 @@
+TITLE:
+Multi-group RI-CLPM - Fully Unconstrained Model
+DATA:
+FILE = "/Users/zekai/WorkPlace/RI_CLPM/MPLUS/ri_clpm_mg_unconstrained.dat";
+ 
+VARIABLE:
+NAMES = CA_1 CA_2 CA_3 CA_4 INT_1 INT_2 INT_3 INT_4 EXT_1 EXT_2 EXT_3 EXT_4 age
+     center race income_group education employment_status cumula gender_group; 
+ MISSING=.;
+ 
+    GROUPING = gender_group (1=Boys 2=Girls);
+  
+ANALYSIS:
+ESTIMATOR = MLR;
+MODEL:
+
+! ==========================================================
+! MODEL for Boys (Group 1)
+! No constraints across time or across groups
+! ==========================================================
+MODEL:
+  ! --- Latent variable definitions ---
+  RI_INT BY INT_1-INT_4@1;
+  RI_CA BY CA_1-CA_4@1;
+  RI_EXT BY EXT_1-EXT_4@1;
+  
+  w_INT1 BY INT_1@1; w_INT2 BY INT_2@1; w_INT3 BY INT_3@1; w_INT4 BY INT_4@1;
+  w_CA1 BY CA_1@1; w_CA2 BY CA_2@1; w_CA3 BY CA_3@1; w_CA4 BY CA_4@1;
+  w_EXT1 BY EXT_1@1; w_EXT2 BY EXT_2@1; w_EXT3 BY EXT_3@1; w_EXT4 BY EXT_4@1;
+  
+  [w_INT1-w_EXT4@0];
+  INT_1-EXT_4@0; ! Fix residual variances of observed indicators to 0
+
+  ! --- Structural paths (estimated separately for each time lag) ---
+  ! Lag from T1 to T2
+  w_INT2 w_CA2 w_EXT2 ON w_INT1 w_CA1 w_EXT1;
+  ! Lag from T2 to T3
+  w_INT3 w_CA3 w_EXT3 ON w_INT2 w_CA2 w_EXT2;
+  ! Lag from T3 to T4
+  w_INT4 w_CA4 w_EXT4 ON w_INT3 w_CA3 w_EXT3;
+
+  ! --- Covariances and Variances ---
+  ! Between-person part
+  RI_INT RI_CA RI_EXT; ! Variances
+  RI_INT WITH RI_CA RI_EXT;
+  RI_CA WITH RI_EXT;
+  
+  ! Within-person part (contemporaneous correlations)
+  w_INT1 WITH w_CA1 w_EXT1; w_CA1 WITH w_EXT1;
+  w_INT2 WITH w_CA2 w_EXT2; w_CA2 WITH w_EXT2;
+  w_INT3 WITH w_CA3 w_EXT3; w_CA3 WITH w_EXT3;
+  w_INT4 WITH w_CA4 w_EXT4; w_CA4 WITH w_EXT4;
+
+  ! --- Covariates on Random Intercepts ---
+  RI_INT RI_CA RI_EXT ON age center 
+    race income_group education employment_status cumula;
+
+! ==========================================================
+! MODEL for Girls (Group 2)
+! All parameters are re-specified to be estimated freely
+! ==========================================================
+MODEL Girls:
+  ! --- Override Mplus defaults ---
+  [INT_1-EXT_4]; 
+  [w_INT1-w_EXT4@0]; 
+  [RI_INT-RI_EXT@0];
+
+OUTPUT:
+STDYX

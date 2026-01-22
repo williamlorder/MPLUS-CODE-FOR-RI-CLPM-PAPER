@@ -1,0 +1,56 @@
+TITLE:
+Externalizing Problems Metric Invariance Model
+DATA:
+FILE = "/Users/zekai/WorkPlace/RI_CLPM/MPLUS/ext_metric_model.dat";
+ 
+VARIABLE:
+NAMES = rul_brk1 rul_brk2 rul_brk3 rul_brk4 agg_beh1 agg_beh2 agg_beh3 agg_beh4; 
+ MISSING=.;
+ 
+ANALYSIS:
+ESTIMATOR = MLR;
+MODEL:
+
+! 定义时间点1的外化问题因子 - 使用相同载荷标签
+           Ext1 BY rul_brk1* (L1)
+                  agg_beh1 (L2);
+           
+           ! 定义时间点2的外化问题因子 - 约束载荷相等
+           Ext2 BY rul_brk2* (L1)
+                  agg_beh2 (L2);
+           
+           ! 定义时间点3的外化问题因子 - 约束载荷相等
+           Ext3 BY rul_brk3* (L1)
+                  agg_beh3 (L2);
+           
+           ! 定义时间点4的外化问题因子 - 约束载荷相等
+           Ext4 BY rul_brk4* (L1)
+                  agg_beh4 (L2);
+           
+           ! 其余模型设置与配置不变性模型相同
+           Ext1@1; Ext2@1; Ext3@1; Ext4@1;
+           [Ext1@0]; [Ext2@0]; [Ext3@0]; [Ext4@0];
+           
+           ! 自由估计项目截距
+           [rul_brk1*]; [rul_brk2*]; [rul_brk3*]; [rul_brk4*];
+           [agg_beh1*]; [agg_beh2*]; [agg_beh3*]; [agg_beh4*];
+           
+           ! 自由估计项目残差方差
+           rul_brk1*; rul_brk2*; rul_brk3*; rul_brk4*;
+           agg_beh1*; agg_beh2*; agg_beh3*; agg_beh4*;
+           
+           ! 估计时间因子之间的相关
+           Ext1 WITH Ext2*; Ext1 WITH Ext3*; Ext1 WITH Ext4*;
+           Ext2 WITH Ext3*; Ext2 WITH Ext4*;
+           Ext3 WITH Ext4*;
+           
+           ! 估计相同项目在不同时间点的残差协方差
+           rul_brk1 WITH rul_brk2*; rul_brk1 WITH rul_brk3*; rul_brk1 WITH rul_brk4*;
+           rul_brk2 WITH rul_brk3*; rul_brk2 WITH rul_brk4*;
+           rul_brk3 WITH rul_brk4*;
+           
+           agg_beh1 WITH agg_beh2*; agg_beh1 WITH agg_beh3*; agg_beh1 WITH agg_beh4*;
+           agg_beh2 WITH agg_beh3*; agg_beh2 WITH agg_beh4*;
+           agg_beh3 WITH agg_beh4*;
+OUTPUT:
+STDYX patterns

@@ -1,0 +1,73 @@
+TITLE:
+Two-variable RI-CLPM - Externalizing and Maltreatment with Covariates
+DATA:
+FILE = "/Users/zekai/WorkPlace/RI_CLPM/MPLUS/ri_clpm_ext_ca_cov.dat";
+ 
+VARIABLE:
+NAMES = CA_1 CA_2 CA_3 CA_4 EXT_1 EXT_2 EXT_3 EXT_4 age center gender race
+     income_group education employment_status; 
+ MISSING=.;
+ 
+ANALYSIS:
+ESTIMATOR = MLR;
+MODEL:
+
+  ! 随机截距因子
+  RI_EXT BY EXT_1-EXT_4@1;
+  RI_CA BY CA_1-CA_4@1;
+  
+  ! 随机截距间协方差
+  RI_EXT WITH RI_CA;
+  
+  ! 计算个体内变量
+  w_EXT1 BY EXT_1@1;
+  w_EXT2 BY EXT_2@1;
+  w_EXT3 BY EXT_3@1;
+  w_EXT4 BY EXT_4@1;
+  
+  w_CA1 BY CA_1@1;
+  w_CA2 BY CA_2@1;
+  w_CA3 BY CA_3@1;
+  w_CA4 BY CA_4@1;
+  
+  ! 设置个体内变量均值为0
+  [w_EXT1-w_EXT4@0];
+  [w_CA1-w_CA4@0];
+  
+  ! 固定各时刻的指标负荷量
+  EXT_1@0; EXT_2@0; EXT_3@0; EXT_4@0;
+  CA_1@0; CA_2@0; CA_3@0; CA_4@0;
+  
+  ! 自回归路径约束
+  w_EXT2 ON w_EXT1 (a3);
+  w_EXT3 ON w_EXT2 (a3);
+  w_EXT4 ON w_EXT3 (a3);
+  
+  w_CA2 ON w_CA1 (a2);
+  w_CA3 ON w_CA2 (a2);
+  w_CA4 ON w_CA3 (a2);
+  
+  ! EXT与CA之间的交叉滞后路径约束
+  w_EXT2 ON w_CA1 (c1);
+  w_EXT3 ON w_CA2 (c1);
+  w_EXT4 ON w_CA3 (c1);
+  
+  w_CA2 ON w_EXT1 (c2);
+  w_CA3 ON w_EXT2 (c2);
+  w_CA4 ON w_EXT3 (c2);
+  
+  ! 同期关联
+  w_EXT1 WITH w_CA1;
+  w_EXT2 WITH w_CA2;
+  w_EXT3 WITH w_CA3;
+  w_EXT4 WITH w_CA4;
+  
+  ! 随机截距方差
+  RI_EXT;
+  RI_CA;
+  
+  ! 协变量对随机截距的影响 - 人口统计学变量
+  RI_EXT RI_CA ON age center gender race income_group education employment_status;
+
+OUTPUT:
+STDYX patterns

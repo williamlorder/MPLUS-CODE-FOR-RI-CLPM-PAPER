@@ -1,0 +1,84 @@
+TITLE:
+CLPM with Unconstrained Cumulative Abuse Effects
+DATA:
+FILE = "/Users/zekai/WorkPlace/RI_CLPM/MPLUS/clpm_tri_full_cov_cum.dat";
+ 
+VARIABLE:
+NAMES = CA_1 CA_2 CA_3 CA_4 INT_1 INT_2 INT_3 INT_4 EXT_1 EXT_2 EXT_3 EXT_4 age
+     center gender race income_group education employment_status cumula; 
+ MISSING=.;
+ 
+ANALYSIS:
+ESTIMATOR = MLR;
+MODEL:
+
+  ! 自回归路径 - 时间稳定性约束
+  INT_2 on INT_1 (a1);
+  INT_3 on INT_2 (a1);
+  INT_4 on INT_3 (a1);
+  
+  CA_2 on CA_1 (a2);
+  CA_3 on CA_2 (a2);
+  CA_4 on CA_3 (a2);
+  
+  EXT_2 on EXT_1 (a3);
+  EXT_3 on EXT_2 (a3);
+  EXT_4 on EXT_3 (a3);
+  
+  ! INT与CA之间的交叉滞后路径 - 时间稳定性约束
+  INT_2 on CA_1 (b1);
+  INT_3 on CA_2 (b1);
+  INT_4 on CA_3 (b1);
+  
+  CA_2 on INT_1 (b2);
+  CA_3 on INT_2 (b2);
+  CA_4 on INT_3 (b2);
+  
+  ! EXT与CA之间的交叉滞后路径 - 时间稳定性约束
+  EXT_2 on CA_1 (c1);
+  EXT_3 on CA_2 (c1);
+  EXT_4 on CA_3 (c1);
+  
+  CA_2 on EXT_1 (c2);
+  CA_3 on EXT_2 (c2);
+  CA_4 on EXT_3 (c2);
+  
+  ! INT与EXT之间的交叉滞后路径 - 时间稳定性约束
+  INT_2 on EXT_1 (d1);
+  INT_3 on EXT_2 (d1);
+  INT_4 on EXT_3 (d1);
+  
+  EXT_2 on INT_1 (d2);
+  EXT_3 on INT_2 (d2);
+  EXT_4 on INT_3 (d2);
+  
+  ! 初始时刻的协方差
+  INT_1 with CA_1;
+  INT_1 with EXT_1;
+  CA_1 with EXT_1;
+  
+  ! 后续时刻的同期相关
+  INT_2 with CA_2;
+  INT_2 with EXT_2;
+  CA_2 with EXT_2;
+  
+  INT_3 with CA_3;
+  INT_3 with EXT_3;
+  CA_3 with EXT_3;
+  
+  INT_4 with CA_4;
+  INT_4 with EXT_4;
+  CA_4 with EXT_4;
+  
+  ! 协变量对所有时间点的影响 - 人口统计学变量
+  INT_1 CA_1 EXT_1 on age center gender race 
+  income_group education employment_status cumula;
+  INT_2 CA_2 EXT_2 on age center gender race 
+  income_group education employment_status cumula;
+  INT_3 CA_3 EXT_3 on age center gender race 
+  income_group education employment_status cumula;
+  INT_4 CA_4 EXT_4 on age center gender race 
+  income_group education employment_status cumula;
+
+OUTPUT:
+STDYX patterns

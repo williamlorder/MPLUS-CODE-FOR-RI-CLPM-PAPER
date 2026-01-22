@@ -1,0 +1,36 @@
+TITLE:
+CLPM with equal effects constraints
+DATA:
+FILE = "/Users/zekai/WorkPlace/RI_CLPM/MPLUS/clpm3.dat";
+ 
+VARIABLE:
+NAMES = CA_1 CA_2 CA_3 CA_4 INT_1 INT_2 INT_3 INT_4; 
+ MISSING=.;
+ 
+ANALYSIS:
+ESTIMATOR = MLR;
+MODEL:
+
+  ! 所有自回归效应相等
+  INT_2 on INT_1 (ar);
+  INT_3 on INT_2 (ar);
+  INT_4 on INT_3 (ar);
+  CA_2 on CA_1 (ar);
+  CA_3 on CA_2 (ar);
+  CA_4 on CA_3 (ar);
+  
+  ! 所有交叉滞后效应相等
+  INT_2 on CA_1 (cl);
+  INT_3 on CA_2 (cl);
+  INT_4 on CA_3 (cl);
+  CA_2 on INT_1 (cl);
+  CA_3 on INT_2 (cl);
+  CA_4 on INT_3 (cl);
+  
+  ! 初始时刻的协方差
+  INT_1 with CA_1;
+  INT_2 with CA_2;
+  INT_3 with CA_3;
+  INT_4 with CA_4;
+OUTPUT:
+STDYX patterns

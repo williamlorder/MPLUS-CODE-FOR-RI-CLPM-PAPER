@@ -1,0 +1,152 @@
+TITLE:
+Scalar Invariance Model for CBCL - All Symptoms on Time Factors
+DATA:
+FILE = "/Users/zekai/WorkPlace/RI_CLPM/MPLUS/scalar_model.dat";
+ 
+VARIABLE:
+NAMES = anx_dep1 anx_dep2 anx_dep3 anx_dep4 wth_dep1 wth_dep2 wth_dep3 wth_dep4
+     som_com1 som_com2 som_com3 som_com4 rul_brk1 rul_brk2 rul_brk3 rul_brk4
+     agg_beh1 agg_beh2 agg_beh3 agg_beh4; 
+ MISSING=.;
+ 
+ANALYSIS:
+ESTIMATOR = MLR;
+MODEL:
+
+! 定义时间点1的因子 - 所有症状加载于一个因子，载荷约束与度量不变性模型相同
+           Time1 BY anx_dep1* (L1)
+                   wth_dep1 (L2)
+                   som_com1 (L3)
+                   rul_brk1 (L4)
+                   agg_beh1 (L5);
+           
+           ! 定义时间点2的因子 - 所有症状加载于一个因子，载荷约束与度量不变性模型相同
+           Time2 BY anx_dep2* (L1)
+                   wth_dep2 (L2)
+                   som_com2 (L3)
+                   rul_brk2 (L4)
+                   agg_beh2 (L5);
+           
+           ! 定义时间点3的因子 - 所有症状加载于一个因子，载荷约束与度量不变性模型相同
+           Time3 BY anx_dep3* (L1)
+                   wth_dep3 (L2)
+                   som_com3 (L3)
+                   rul_brk3 (L4)
+                   agg_beh3 (L5);
+           
+           ! 定义时间点4的因子 - 所有症状加载于一个因子，载荷约束与度量不变性模型相同
+           Time4 BY anx_dep4* (L1)
+                   wth_dep4 (L2)
+                   som_com4 (L3)
+                   rul_brk4 (L4)
+                   agg_beh4 (L5);
+           
+           ! 设置因子方差为1以识别模型
+           Time1@1;
+           Time2@1;
+           Time3@1;
+           Time4@1;
+           
+           ! 设置时间点1的因子均值为0，其他时间点的因子均值自由估计
+           [Time1@0];
+           [Time2*];
+           [Time3*];
+           [Time4*];
+           
+           ! 设置项目截距相等（标量不变性的关键约束）
+           [anx_dep1] (I1);
+           [anx_dep2] (I1);
+           [anx_dep3] (I1);
+           [anx_dep4] (I1);
+           
+           [wth_dep1] (I2);
+           [wth_dep2] (I2);
+           [wth_dep3] (I2);
+           [wth_dep4] (I2);
+           
+           [som_com1] (I3);
+           [som_com2] (I3);
+           [som_com3] (I3);
+           [som_com4] (I3);
+           
+           [rul_brk1] (I4);
+           [rul_brk2] (I4);
+           [rul_brk3] (I4);
+           [rul_brk4] (I4);
+           
+           [agg_beh1] (I5);
+           [agg_beh2] (I5);
+           [agg_beh3] (I5);
+           [agg_beh4] (I5);
+           
+           ! 自由估计项目残差方差
+           anx_dep1*;
+           anx_dep2*;
+           anx_dep3*;
+           anx_dep4*;
+           
+           wth_dep1*;
+           wth_dep2*;
+           wth_dep3*;
+           wth_dep4*;
+           
+           som_com1*;
+           som_com2*;
+           som_com3*;
+           som_com4*;
+           
+           rul_brk1*;
+           rul_brk2*;
+           rul_brk3*;
+           rul_brk4*;
+           
+           agg_beh1*;
+           agg_beh2*;
+           agg_beh3*;
+           agg_beh4*;
+           
+           ! 估计时间因子之间的相关
+           Time1 WITH Time2*;
+           Time1 WITH Time3*;
+           Time1 WITH Time4*;
+           Time2 WITH Time3*;
+           Time2 WITH Time4*;
+           Time3 WITH Time4*;
+           
+           ! 估计相同项目在不同时间点的残差协方差
+           anx_dep1 WITH anx_dep2*;
+           anx_dep1 WITH anx_dep3*;
+           anx_dep1 WITH anx_dep4*;
+           anx_dep2 WITH anx_dep3*;
+           anx_dep2 WITH anx_dep4*;
+           anx_dep3 WITH anx_dep4*;
+           
+           wth_dep1 WITH wth_dep2*;
+           wth_dep1 WITH wth_dep3*;
+           wth_dep1 WITH wth_dep4*;
+           wth_dep2 WITH wth_dep3*;
+           wth_dep2 WITH wth_dep4*;
+           wth_dep3 WITH wth_dep4*;
+           
+           som_com1 WITH som_com2*;
+           som_com1 WITH som_com3*;
+           som_com1 WITH som_com4*;
+           som_com2 WITH som_com3*;
+           som_com2 WITH som_com4*;
+           som_com3 WITH som_com4*;
+           
+           rul_brk1 WITH rul_brk2*;
+           rul_brk1 WITH rul_brk3*;
+           rul_brk1 WITH rul_brk4*;
+           rul_brk2 WITH rul_brk3*;
+           rul_brk2 WITH rul_brk4*;
+           rul_brk3 WITH rul_brk4*;
+           
+           agg_beh1 WITH agg_beh2*;
+           agg_beh1 WITH agg_beh3*;
+           agg_beh1 WITH agg_beh4*;
+           agg_beh2 WITH agg_beh3*;
+           agg_beh2 WITH agg_beh4*;
+           agg_beh3 WITH agg_beh4*;
+OUTPUT:
+STDYX patterns

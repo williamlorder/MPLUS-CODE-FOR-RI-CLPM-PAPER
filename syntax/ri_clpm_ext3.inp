@@ -1,0 +1,66 @@
+TITLE:
+RI-CLPM EXT-CA with equal effects constraints
+DATA:
+FILE = "/Users/zekai/WorkPlace/RI_CLPM/MPLUS/ri_clpm_ext3.dat";
+ 
+VARIABLE:
+NAMES = CA_1 CA_2 CA_3 CA_4 EXT_1 EXT_2 EXT_3 EXT_4; 
+ MISSING=.;
+ 
+ANALYSIS:
+ESTIMATOR = MLR;
+MODEL:
+
+  ! 随机截距因子
+  RI_EXT BY EXT_1-EXT_4@1;
+  RI_CA BY CA_1-CA_4@1;
+  
+  ! 随机截距间协方差
+  RI_EXT WITH RI_CA;
+  
+  ! 计算个体内变量
+  w_EXT1 BY EXT_1@1;
+  w_EXT2 BY EXT_2@1;
+  w_EXT3 BY EXT_3@1;
+  w_EXT4 BY EXT_4@1;
+  
+  w_CA1 BY CA_1@1;
+  w_CA2 BY CA_2@1;
+  w_CA3 BY CA_3@1;
+  w_CA4 BY CA_4@1;
+  
+  ! 设置个体内变量均值为0
+  [w_EXT1-w_EXT4@0];
+  [w_CA1-w_CA4@0];
+  
+  ! 固定各时刻的指标负荷量
+  EXT_1@0; EXT_2@0; EXT_3@0; EXT_4@0;
+  CA_1@0; CA_2@0; CA_3@0; CA_4@0;
+  
+  ! 所有自回归效应相等
+  w_EXT2 ON w_EXT1 (ar);
+  w_EXT3 ON w_EXT2 (ar);
+  w_EXT4 ON w_EXT3 (ar);
+  w_CA2 ON w_CA1 (ar);
+  w_CA3 ON w_CA2 (ar);
+  w_CA4 ON w_CA3 (ar);
+  
+  ! 所有交叉滞后效应相等
+  w_EXT2 ON w_CA1 (cl);
+  w_EXT3 ON w_CA2 (cl);
+  w_EXT4 ON w_CA3 (cl);
+  w_CA2 ON w_EXT1 (cl);
+  w_CA3 ON w_EXT2 (cl);
+  w_CA4 ON w_EXT3 (cl);
+  
+  ! 同期关联
+  w_EXT1 WITH w_CA1;
+  w_EXT2 WITH w_CA2;
+  w_EXT3 WITH w_CA3;
+  w_EXT4 WITH w_CA4;
+  
+  ! 随机截距方差
+  RI_EXT;
+  RI_CA;
+OUTPUT:
+STDYX patterns

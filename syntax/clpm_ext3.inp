@@ -1,0 +1,36 @@
+TITLE:
+CLPM EXT-CA with equal effects constraints
+DATA:
+FILE = "/Users/zekai/WorkPlace/RI_CLPM/MPLUS/clpm_ext3.dat";
+ 
+VARIABLE:
+NAMES = CA_1 CA_2 CA_3 CA_4 EXT_1 EXT_2 EXT_3 EXT_4; 
+ MISSING=.;
+ 
+ANALYSIS:
+ESTIMATOR = MLR;
+MODEL:
+
+  ! 所有自回归效应相等
+  EXT_2 on EXT_1 (ar);
+  EXT_3 on EXT_2 (ar);
+  EXT_4 on EXT_3 (ar);
+  CA_2 on CA_1 (ar);
+  CA_3 on CA_2 (ar);
+  CA_4 on CA_3 (ar);
+  
+  ! 所有交叉滞后效应相等
+  EXT_2 on CA_1 (cl);
+  EXT_3 on CA_2 (cl);
+  EXT_4 on CA_3 (cl);
+  CA_2 on EXT_1 (cl);
+  CA_3 on EXT_2 (cl);
+  CA_4 on EXT_3 (cl);
+  
+  ! 初始时刻的协方差
+  EXT_1 with CA_1;
+  EXT_2 with CA_2;
+  EXT_3 with CA_3;
+  EXT_4 with CA_4;
+OUTPUT:
+STDYX patterns

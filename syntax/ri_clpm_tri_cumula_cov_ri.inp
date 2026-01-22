@@ -1,0 +1,120 @@
+TITLE:
+Complete Three-variable RI-CLPM with cumulative maltreatment and Covariates (RI)
+DATA:
+FILE = "/Users/zekai/WorkPlace/RI_CLPM/MPLUS/ri_clpm_tri_cumula_cov_ri.dat";
+ 
+VARIABLE:
+NAMES = CA_1 CA_2 CA_3 CA_4 INT_1 INT_2 INT_3 INT_4 EXT_1 EXT_2 EXT_3 EXT_4 age
+     center gender race income_group education employment_status cumula; 
+ MISSING=.;
+ 
+ANALYSIS:
+ESTIMATOR = MLR;
+MODEL:
+
+  ! 随机截距因子
+  RI_INT BY INT_1-INT_4@1;
+  RI_CA BY CA_1-CA_4@1;
+  RI_EXT BY EXT_1-EXT_4@1;
+  
+  ! 随机截距间协方差
+  RI_INT WITH RI_CA;
+  RI_INT WITH RI_EXT;
+  RI_CA WITH RI_EXT;
+  
+  ! 计算个体内变量
+  w_INT1 BY INT_1@1;
+  w_INT2 BY INT_2@1;
+  w_INT3 BY INT_3@1;
+  w_INT4 BY INT_4@1;
+  
+  w_CA1 BY CA_1@1;
+  w_CA2 BY CA_2@1;
+  w_CA3 BY CA_3@1;
+  w_CA4 BY CA_4@1;
+  
+  w_EXT1 BY EXT_1@1;
+  w_EXT2 BY EXT_2@1;
+  w_EXT3 BY EXT_3@1;
+  w_EXT4 BY EXT_4@1;
+  
+  ! 设置个体内变量均值为0
+  [w_INT1-w_INT4@0];
+  [w_CA1-w_CA4@0];
+  [w_EXT1-w_EXT4@0];
+  
+  ! 固定各时刻的指标负荷量
+  INT_1@0; INT_2@0; INT_3@0; INT_4@0;
+  CA_1@0; CA_2@0; CA_3@0; CA_4@0;
+  EXT_1@0; EXT_2@0; EXT_3@0; EXT_4@0;
+  
+  ! 自回归路径约束
+  w_INT2 ON w_INT1 (a1);
+  w_INT3 ON w_INT2 (a1);
+  w_INT4 ON w_INT3 (a1);
+  
+  w_CA2 ON w_CA1 (a2);
+  w_CA3 ON w_CA2 (a2);
+  w_CA4 ON w_CA3 (a2);
+  
+  w_EXT2 ON w_EXT1 (a3);
+  w_EXT3 ON w_EXT2 (a3);
+  w_EXT4 ON w_EXT3 (a3);
+  
+  ! INT与CA之间的交叉滞后路径约束
+  w_INT2 ON w_CA1 (b1);
+  w_INT3 ON w_CA2 (b1);
+  w_INT4 ON w_CA3 (b1);
+  
+  w_CA2 ON w_INT1 (b2);
+  w_CA3 ON w_INT2 (b2);
+  w_CA4 ON w_INT3 (b2);
+  
+  ! EXT与CA之间的交叉滞后路径约束
+  w_EXT2 ON w_CA1 (c1);
+  w_EXT3 ON w_CA2 (c1);
+  w_EXT4 ON w_CA3 (c1);
+  
+  w_CA2 ON w_EXT1 (c2);
+  w_CA3 ON w_EXT2 (c2);
+  w_CA4 ON w_EXT3 (c2);
+  
+  ! INT与EXT之间的交叉滞后路径约束
+  w_INT2 ON w_EXT1 (d1);
+  w_INT3 ON w_EXT2 (d1);
+  w_INT4 ON w_EXT3 (d1);
+  
+  w_EXT2 ON w_INT1 (d2);
+  w_EXT3 ON w_INT2 (d2);
+  w_EXT4 ON w_INT3 (d2);
+  
+  ! 同期关联
+  w_INT1 WITH w_CA1;
+  w_INT1 WITH w_EXT1;
+  w_CA1 WITH w_EXT1;
+  
+  w_INT2 WITH w_CA2;
+  w_INT2 WITH w_EXT2;
+  w_CA2 WITH w_EXT2;
+  
+  w_INT3 WITH w_CA3;
+  w_INT3 WITH w_EXT3;
+  w_CA3 WITH w_EXT3;
+  
+  w_INT4 WITH w_CA4;
+  w_INT4 WITH w_EXT4;
+  w_CA4 WITH w_EXT4;
+  
+  ! 随机截距方差
+  RI_INT;
+  RI_CA;
+  RI_EXT;
+  
+  ! 协变量对随机截距的影响 - 人口统计学变量
+  RI_INT RI_CA RI_EXT ON age center gender 
+  race income_group education employment_status;
+  
+  RI_INT RI_CA RI_EXT ON cumula;
+
+OUTPUT:
+STDYX patterns

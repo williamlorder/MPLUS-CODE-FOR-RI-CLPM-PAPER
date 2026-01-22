@@ -1,0 +1,72 @@
+TITLE:
+Complete Three-variable CLPM
+DATA:
+FILE = "/Users/zekai/WorkPlace/RI_CLPM/MPLUS/clpm_tri_full.dat";
+ 
+VARIABLE:
+NAMES = CA_1 CA_2 CA_3 CA_4 INT_1 INT_2 INT_3 INT_4 EXT_1 EXT_2 EXT_3 EXT_4; 
+ MISSING=.;
+ 
+ANALYSIS:
+ESTIMATOR = MLR;
+MODEL:
+
+  ! 自回归路径
+  INT_2 on INT_1;
+  INT_3 on INT_2;
+  INT_4 on INT_3;
+  
+  CA_2 on CA_1;
+  CA_3 on CA_2;
+  CA_4 on CA_3;
+  
+  EXT_2 on EXT_1;
+  EXT_3 on EXT_2;
+  EXT_4 on EXT_3;
+  
+  ! INT与CA之间的交叉滞后路径
+  INT_2 on CA_1;
+  INT_3 on CA_2;
+  INT_4 on CA_3;
+  
+  CA_2 on INT_1;
+  CA_3 on INT_2;
+  CA_4 on INT_3;
+  
+  ! EXT与CA之间的交叉滞后路径
+  EXT_2 on CA_1;
+  EXT_3 on CA_2;
+  EXT_4 on CA_3;
+  
+  CA_2 on EXT_1;
+  CA_3 on EXT_2;
+  CA_4 on EXT_3;
+  
+  ! INT与EXT之间的交叉滞后路径 - 新增
+  INT_2 on EXT_1;
+  INT_3 on EXT_2;
+  INT_4 on EXT_3;
+  
+  EXT_2 on INT_1;
+  EXT_3 on INT_2;
+  EXT_4 on INT_3;
+  
+  ! 初始时刻的协方差
+  INT_1 with CA_1;
+  INT_1 with EXT_1;
+  CA_1 with EXT_1;
+  
+  ! 后续时刻的同期相关
+  INT_2 with CA_2;
+  INT_2 with EXT_2;
+  CA_2 with EXT_2;
+  
+  INT_3 with CA_3;
+  INT_3 with EXT_3;
+  CA_3 with EXT_3;
+  
+  INT_4 with CA_4;
+  INT_4 with EXT_4;
+  CA_4 with EXT_4;
+OUTPUT:
+STDYX patterns

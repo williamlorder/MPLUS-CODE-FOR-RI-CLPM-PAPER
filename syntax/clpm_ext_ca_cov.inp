@@ -1,0 +1,48 @@
+TITLE:
+Two-variable CLPM - Externalizing and Maltreatment with Covariates
+DATA:
+FILE = "/Users/zekai/WorkPlace/RI_CLPM/MPLUS/clpm_ext_ca_cov.dat";
+ 
+VARIABLE:
+NAMES = CA_1 CA_2 CA_3 CA_4 EXT_1 EXT_2 EXT_3 EXT_4 age center gender race
+     income_group education employment_status; 
+ MISSING=.;
+ 
+ANALYSIS:
+ESTIMATOR = MLR;
+MODEL:
+
+  ! 自回归路径 - 时间稳定性约束
+  EXT_2 on EXT_1 (a3);
+  EXT_3 on EXT_2 (a3);
+  EXT_4 on EXT_3 (a3);
+  
+  CA_2 on CA_1 (a2);
+  CA_3 on CA_2 (a2);
+  CA_4 on CA_3 (a2);
+  
+  ! EXT与CA之间的交叉滞后路径 - 时间稳定性约束
+  EXT_2 on CA_1 (c1);
+  EXT_3 on CA_2 (c1);
+  EXT_4 on CA_3 (c1);
+  
+  CA_2 on EXT_1 (c2);
+  CA_3 on EXT_2 (c2);
+  CA_4 on EXT_3 (c2);
+  
+  ! 初始时刻的协方差
+  EXT_1 with CA_1;
+  
+  ! 后续时刻的同期相关
+  EXT_2 with CA_2;
+  EXT_3 with CA_3;
+  EXT_4 with CA_4;
+  
+  ! 协变量对所有时间点的影响 - 人口统计学变量
+  EXT_1 CA_1 on age center gender race income_group education employment_status;
+  EXT_2 CA_2 on age center gender race income_group education employment_status;
+  EXT_3 CA_3 on age center gender race income_group education employment_status;
+  EXT_4 CA_4 on age center gender race income_group education employment_status;
+
+OUTPUT:
+STDYX patterns
